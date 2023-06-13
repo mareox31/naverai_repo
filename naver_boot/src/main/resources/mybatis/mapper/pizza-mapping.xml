@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="chatbot.PizzaMapper"> <!--사용맵퍼누구니// 인터페이스 맵퍼 어노테이션붙은곳// xml에게 맵퍼 객체누군지알려준다. -->
+
+<insert id="insertPizza" parameterType="pizza" >
+ insert into pizza(kind, size, phone, price, ordertime) 
+ values(#{kind}, #{size}, #{phone}, #{price}, now())
+</insert>
+<!-- 피자dto의 kind값, ...  
+알리아스설정후엔 chatbot.PizzaDTO 대신 pizza쓰면됨(mybatis-config.xml에해놨음)
+-->
+
+<!-- 
+insert into pizza(kind, size, phone, price, ordertime ) 
+values('파인애플피자', '특대', '01011111111', 22000, now());
+ -->
+
+</mapper>
+
+
+
+
+
+

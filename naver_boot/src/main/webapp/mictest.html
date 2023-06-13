@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<button id= "record" > 녹음시작 </button>
+<button id= "stop" > 녹음종료 </button>
+<div id="sound"></div>
+
+<script>
+let record = document.getElementById("record");//레코드버튼 클릭이벤트처리위해
+let stop = document.getElementById("stop");
+let sound = document.getElementById("sound");
+
+//브라우저 녹음기나 카메라 사용 지원여부.
+if(navigator.mediaDevices){ //사용할수이니? 
+		console.log("지원가능");//개발자도구서 보이는곳.
+		var constraint = {"audio":true}; //녹음기능 활성화 . //카메라쓸거면 video쓰겠다하면됨.
+}
+
+//녹음 진행 동안 -blob객체 - 녹음 종료- mp3파일 생성 저장 //이진수 기록객체. blob 녹음내용가지고있는 객체를 ->mp3로 만들어줘.그걸 div태그 audio에들려줘.
+//녹음내용 바이너리 라지오브젝트. blob
+let chunks = []; //여기다 녹음내용 모아둘것, 배열에다. 모았다 blob으로 만들어서 mp3객체로만들어줄것.
+//녹음기사용준비됐으면, 이제 해 .then
+//catch 에러발생시.에러처리
+navigator.mediaDevices.getUserMedia(constraint).then( function(stream){//녹음기사용가능하면, 스트림이 녹음중데이터를말함, 그걸 미디오레코더 녹음기로쓰겠다?
+	var mediaRecorder = new MediaRecorder(stream);//녹음기 준비.(녹음할준비o)
+	record.onclick = function(){
+		mediaRecorder.start();//녹음시작
+		record.style.color = "red";//녹음중일떈 빨간색보여짐.
+		record.style.backgroundColor="blue";
+	}
+	
+	stop.onclick= function(){
+		mediaRecorder.stop();//녹음중단
+		record.style.color = "";
+		record.style.backgroundColor="";
+	}
+	
+	//여기자리 
+	//녹음시작상태이면,(시작버튼누르면) chunks에 녹음 데이터 저장하라. 
+	mediaRecorder.ondataavailable = function(d){ //데이터모아.
+		chunks.push(d.data);//녹음데이터 모아.
+		
+	}
+
+	//녹음 정지상태이면 chunks=>blob - >mp3
+	mediaRecorder.onstop = function(){
+		var audio = document.createElement("audio");//돔구조로 오디오 태그만들어. 
+		audio.setAttribute("controls","");
+		audio.controls = true;//<컨트롤즈 속성 하나만든것. <audio controls></audio>
+		//document.getElementById("sound")
+		sound.appendChild(audio);//오디오 태그 추가하라. <div><audio controls></audio></div>
+		
+		
+		//녹음 데이터 가져와서 audio 태그 재생
+		var blob = new Blob(chunks, {"type":"audio/mp3"});//녹음데이터 chunk를 가져와서 blob으로만들고, 그걸 아래서 mp3로만든것. 
+				//객체형태여야하고, 변수이름타입정해줘야함?// 소리 ? 소리+미디어인지 봐야함?
+				//blob 
+		var mp3url = URL.createObjectURL(blob);
+		audio.src= mp3url;
+			
+		//다음 녹음을 위해 chunks 초기화  : 녹음시작누르면 새롭게 써야하니 초기화.
+		chunks = [];
+		
+		var a = document.createElement("a");
+		sound.appendChild(a); //<div><audio controls></audio> <a href=mp3파일명>파일로저장</a> </div>
+		a.href=mp3url;
+		a.innerHTML = "파일로 저장";
+		a.download = "a.mp3";
+		
+		
+		
+		
+	}
+	
+	
+})//then end- then안에 함수들어가있듯, catch 에러처리도 안에 들어감. //녹음 내가 쓰겠다.//콜백함수
+.catch(function(err){console.log("오류발생" + err )});//catch end
+
+
+
+
+
+
+</script>
+
+
+
+</body>
+</html>
+
+<!-- 영향 안받는 정적 파일 공간 static -->
